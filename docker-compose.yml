@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  litespeed:
+    image: litespeedtech/openlitespeed:1.8.1-lsphp83
+    container_name: xf_litespeed
+    volumes:
+      - ./xenforo:/var/www/vhosts/xenforo
+      - ./lsconfig:/usr/local/lsws/conf
+    networks:
+      - internal
+    ports:
+      - "80:80"
+      - "443:443"
+      - "7080:7080"
+
+  mysql:
+    image: mysql:latest
+    container_name: xf_db
+    networks:
+      - internal
+    volumes:
+      - xf-db-data:/var/lib/mysql
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_DATABASE: xenforo
+      MYSQL_USER: xenforo
+      MYSQL_PASSWORD: ${XF_DB_PASSWORD}
+
+  elastic-search:
+    image: elasticsearch:8.15.3
+    container_name: xf_elastic_search
+    networks:
+      - internal
+    volumes:
+      - xf-elastic-search-data:/usr/share/elasticsearch/data
+    
+
+volumes:
+  xf-db-data:
+  xf-elastic-search-data:
+
+networks:
+  internal:
+    driver: bridge

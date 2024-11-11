@@ -1,0 +1,13 @@
+docRoot                   /var/www/vhosts/xenforo
+vhDomain                  localhost
+enableGzip                1
+
+index  {
+  useServer               1
+}
+
+rewrite  {
+  enable                  1
+  autoLoadHtaccess        1
+}
+
