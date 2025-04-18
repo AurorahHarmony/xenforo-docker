@@ -2,7 +2,7 @@ version: '3'
 
 services:
   litespeed:
-    image: litespeedtech/openlitespeed:1.8.1-lsphp83
+    image: litespeedtech/openlitespeed:1.8.3-lsphp83
     container_name: xf_litespeed
     volumes:
       - ./xenforo:/var/www/vhosts/xenforo
