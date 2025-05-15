@@ -1,9 +1,8 @@
-version: '3'
-
 services:
   litespeed:
     image: litespeedtech/openlitespeed:1.8.3-lsphp83
     container_name: xf_litespeed
+    restart: unless-stopped
     volumes:
       - ./xenforo:/var/www/vhosts/xenforo
       - ./lsconfig:/usr/local/lsws/conf
@@ -17,6 +16,7 @@ services:
   mysql:
     image: mysql:latest
     container_name: xf_db
+    restart: unless-stopped
     networks:
       - internal
     volumes:
@@ -30,15 +30,37 @@ services:
   elastic-search:
     image: elasticsearch:8.15.3
     container_name: xf_elastic_search
+    restart: unless-stopped
     networks:
       - internal
     volumes:
       - xf-elastic-search-data:/usr/share/elasticsearch/data
-    
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1500m
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: xf_redis
+    restart: unless-stopped
+    command: redis-server --requirepass "$XF_REDIS_PASSWORD" --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - internal
+    volumes:
+      - xf-redis-data:/data
+    environment:
+      XF_REDIS_PASSWORD: ${XF_REDIS_PASSWORD}
 
 volumes:
   xf-db-data:
   xf-elastic-search-data:
+  xf-redis-data:
 
 networks:
   internal:
